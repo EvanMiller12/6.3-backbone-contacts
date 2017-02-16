@@ -27,3 +27,19 @@ img {
 .submit-button{
   margin-top: 25px;
 }
+
+.contact-group{
+  border: 1px solid black;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  width: 400px;
+  
+  span{
+    padding-right: 10px;
+    font-weight: bold;
+  }
+
+  li{
+    list-style: none;
+  }
+}

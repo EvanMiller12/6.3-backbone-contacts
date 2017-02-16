@@ -8,7 +8,7 @@ $(function(){
   var contacts = new models.ContactCollection();
 
   var contactForm = new views.ContactForm({collection: contacts});
-  $('.home').append(contactForm.render().el);
+  $('.form-input').append(contactForm.render().el);
 
   var contactList = new views.ContactList({collection: contacts});
   $('.app').append(contactList.render().el);

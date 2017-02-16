@@ -10,7 +10,7 @@ var ContactForm = Backbone.View.extend({
   class: 'well',
 
   events: {
-    'submit': 'createContact'
+    'submit .submit-button': 'createContact'
   },
 
   createContact: function(event){
