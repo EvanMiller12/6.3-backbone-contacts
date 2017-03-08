@@ -5,14 +5,14 @@ var views = require('./views/contact.js');
 
 $(function(){
 
-  var contacts = new models.ContactCollection();
+  var contactCollection = new models.ContactCollection();
 
-  var contactForm = new views.ContactForm({collection: contacts});
+  var contactForm = new views.ContactForm({collection: contactCollection});
   $('.form-input').append(contactForm.render().el);
 
-  var contactList = new views.ContactList({collection: contacts});
+  var contactList = new views.ContactList({collection: contactCollection});
   $('.app').append(contactList.render().el);
 
-  contacts.fetch();
+  contactCollection.fetch();
 
 });

@@ -4,10 +4,17 @@ var Backbone = require('backbone');
 var contactFormTemplate = require('../../templates/contact_form.hbs');
 var contactInfoTemplate = require('../../templates/contact_info.hbs');
 
+// $.fn.serializeObject = function(){
+//   return this.serializeArray().reduce(function(acum, i){
+//     acum[i.name] = i.value;
+//     return acum;
+//   }, {});
+// }
+
 var ContactForm = Backbone.View.extend({
   tagName: 'form',
   id: 'contact-form',
-  class: 'well',
+  className: 'well',
 
   events: {
     'submit .submit-button': 'createContact'
@@ -18,11 +25,12 @@ var ContactForm = Backbone.View.extend({
 
     var contacts = {
       contactName: $('#contactName').val(),
-      contactNumber: $('#number').val(),
-      contactEmail: $('#email').val(),
-      contactLinkedin: $('#linkedin').val()
+      number: $('#number').val(),
+      email: $('#email').val(),
+      linkedin: $('#linkedin').val()
     }
-    this.collection.create(contacts);
+    this.collection.create({contacts});
+
   },
   render: function(){
     this.$el.html(contactFormTemplate());
@@ -37,12 +45,10 @@ var ContactList = Backbone.View.extend({
   initialize: function(){
     this.listenTo(this.collection, 'add', this.renderContactInfo);
   },
-
-  renderContactInfo: function(info){
-    var contactInfo = new ContactInfoView({model: info});
+  renderContactInfo: function(contact){
+    var contactInfo = new ContactInfoView({model: contact});
     this.$el.append(contactInfo.render().el);
   },
-
   render: function(){
     return this;
   }
@@ -61,13 +67,15 @@ var ContactInfoView = Backbone.View.extend({
     this.listenTo(this.model, 'destroy', this.remove);
   },
 
-  deleteContact: function(){
+  deleteContact: function(event){
+    event.preventDefault();
     this.model.destroy();
   },
 
   render: function(){
     var context = this.model.toJSON();
-    this.$el.html(this.template(context));
+    var contact = this.template(context)
+    this.$el.html(contact);
     return this;
   }
 })
