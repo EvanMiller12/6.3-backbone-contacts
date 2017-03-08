@@ -25,9 +25,9 @@
     , "backbone": "^1.3.1"
     , "handlebars": "^4.0.5"
     , "hbsfy": "^2.5.1"
-    
-    
-    
+
+
+
   },
   "scripts": {
     "html": "cp app/*.html dist/",
@@ -36,7 +36,7 @@
     "autoprefixer": "postcss -u autoprefixer -r dist/css/*.css",
 
     "lint": "eslint app/scripts",
-    "browserify": "browserify app/scripts/index.js | uglifyjs -c > dist/js/bundle.js",
+    "browserify": "browserify app/scripts/index.js -o dist/js/bundle.js",
 
     "imagemin": "imagemin app/images dist/images -p",
     "favicon": "cp app/favicon.ico dist/",
@@ -60,7 +60,7 @@
     "transform": [
       "browserify-shim",
       "hbsfy",
-      
+
       "strictify"
     ]
   },
