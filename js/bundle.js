@@ -9,6 +9,9 @@ $(function(){
 
   var contactCollection = new models.ContactCollection();
 
+  var contactControl = new views.ContactFormControl();
+  $('.form-input').append(contactControl.render().el);
+
   var contactForm = new views.ContactForm({collection: contactCollection});
   $('.form-input').append(contactForm.render().el);
 
@@ -19,7 +22,7 @@ $(function(){
 
 });
 
-},{"./models/contact.js":2,"./views/contact.js":3,"jquery":27}],2:[function(require,module,exports){
+},{"./models/contact.js":2,"./views/contact.js":3,"jquery":28}],2:[function(require,module,exports){
 "use strict";
 var Backbone = require('backbone');
 
@@ -29,7 +32,7 @@ var Contact = Backbone.Model.extend({
 
 var ContactCollection = Backbone.Collection.extend({
   model: Contact,
-  url: 'https://tiny-lasagna-server.herokuapp.com/collections/contacts'
+  url: 'https://tiny-lasagna-server.herokuapp.com/collections/ev-contacts'
 });
 
 module.exports = {
@@ -37,11 +40,12 @@ module.exports = {
   ContactCollection: ContactCollection
 };
 
-},{"backbone":6}],3:[function(require,module,exports){
+},{"backbone":7}],3:[function(require,module,exports){
 "use strict";
 var $ = require('jquery');
 var Backbone = require('backbone');
 
+var contactControlTemplate = require('../../templates/contact_control.hbs');
 var contactFormTemplate = require('../../templates/contact_form.hbs');
 var contactInfoTemplate = require('../../templates/contact_info.hbs');
 
@@ -52,29 +56,55 @@ var contactInfoTemplate = require('../../templates/contact_info.hbs');
 //   }, {});
 // }
 
+var ContactFormControl = Backbone.View.extend({
+  tagName: 'div',
+  className: 'form-control-wrapper',
+  template: contactControlTemplate,
+  
+  events: {
+    'click .form-toggler': 'toggleContactForm'
+  },
+
+  toggleContactForm: function() {
+    $('#contact-form').slideToggle();
+  },
+  
+  render: function() {
+    this.$el.html(this.template());
+    return this;
+  }
+})
+
 var ContactForm = Backbone.View.extend({
   tagName: 'form',
   id: 'contact-form',
-  className: 'well',
+  template: contactFormTemplate,
 
   events: {
-    'submit .submit-button': 'createContact'
+    'submit': 'createContact'
   },
 
-  createContact: function(event){
-    event.preventDefault();
+  createContact: function(e){
+    e.preventDefault();
 
     var contacts = {
-      contactName: $('#contactName').val(),
-      number: $('#number').val(),
+      firstName: $('#first-name').val(),
+      lastName: $('#last-name').val(),
+      phoneNumber: $('#c-number').val(),
       email: $('#email').val(),
       linkedin: $('#linkedin').val()
     }
-    this.collection.create({contacts});
-
+    this.collection.create(contacts);
+    
+    $('#first-name').val('');
+    $('#last-name').val('');
+    $('#c-number').val('');
+    $('#email').val('');
+    $('#linkedin').val();
   },
+
   render: function(){
-    this.$el.html(contactFormTemplate());
+    this.$el.html(this.template());
     return this;
   }
 });
@@ -89,9 +119,6 @@ var ContactList = Backbone.View.extend({
   renderContactInfo: function(contact){
     var contactInfo = new ContactInfoView({model: contact});
     this.$el.append(contactInfo.render().el);
-  },
-  render: function(){
-    return this;
   }
 });
 
@@ -101,17 +128,49 @@ var ContactInfoView = Backbone.View.extend({
   template: contactInfoTemplate,
 
   events: {
-    'click .delete-contact': 'deleteContact'
+    'click .delete-contact': 'deleteContact',
+    'click .edit-contact' : 'editContact'
   },
 
   initialize: function(){
     this.listenTo(this.model, 'destroy', this.remove);
   },
 
-  deleteContact: function(event){
-    event.preventDefault();
+  deleteContact: function(e){
+    e.preventDefault();
     this.model.destroy();
   },
+
+  // editContact: function(e) {
+  //   e.preventDefault();
+    
+  //   var currContext = this.model.toJSON();
+ 
+  //   $('#contact-form').show();
+  //   $('.edit-contact').hide();
+  //   $('.update-contact').show();
+
+  //   $('#first-name').val(currContext.firstName);
+  //   $('#last-name').val(currContext.lastName);
+  //   $('#c-number').val(currContext.phoneNumber);
+  //   $('#email').val(currContext.email);
+  //   $('#linkedin').val(currContext.linkedin);
+
+  // },
+
+  //   updateContact: function(e) {
+  //   e.preventDefault();
+    
+  //    var updatedContact = {
+  //     firstName: $('#first-name').val(),
+  //     lastName: $('#last-name').val(),
+  //     phoneNumber: $('#c-number').val(),
+  //     email: $('#email').val(),
+  //     linkedin: $('#linkedin').val()
+  //   }
+  //   this.model.set(updatedContact);
+  //   console.log('clicked');
+  // },
 
   render: function(){
     var context = this.model.toJSON();
@@ -122,38 +181,55 @@ var ContactInfoView = Backbone.View.extend({
 })
 
 module.exports = {
-  ContactForm: ContactForm,
-  ContactList: ContactList,
-  ContactInfoView: ContactInfoView
+  ContactFormControl,
+  ContactForm,
+  ContactList,
+  ContactInfoView
 }
 
-},{"../../templates/contact_form.hbs":4,"../../templates/contact_info.hbs":5,"backbone":6,"jquery":27}],4:[function(require,module,exports){
+},{"../../templates/contact_control.hbs":4,"../../templates/contact_form.hbs":5,"../../templates/contact_info.hbs":6,"backbone":7,"jquery":28}],4:[function(require,module,exports){
 "use strict";
 // hbsfy compiled Handlebars template
 var HandlebarsCompiler = require('hbsfy/runtime');
 module.exports = HandlebarsCompiler.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
-    return "<h1>Enter Contact Information</h1>\n  <div class=\"form-group col-md-6\">\n    <label for=\"contactName\">\n      Contact Name\n    </label>\n    <input type=\"text\" class=\"form-control\" id=\"contactName\" name=\"contactName\" placeholder=\"ENTER NEW CONTACT NAME\" />\n      <div class=\"form-info\">\n        <label for=\"number\">\n          Number\n        </label>\n        <input type=\"text\" class=\"form-control\" id=\"number\" name=\"number\" placeholder=\"ENTER CONTACT NUMBER\" />\n        <label for=\"email\">\n          Email\n        </label>\n        <input type=\"text\" class=\"form-control\" id=\"email\" name=\"email\" placeholder=\"ENTER CONTACT EMAIL\" />\n        <label for=\"linkedin\">\n          Linkedin Username\n        </label>\n        <input type=\"text\" class=\"form-control\" id=\"linkedin\" name=\"linkedin\" placeholder=\"ENTER LINKEDIN USERNAME\" />\n      </div>\n        <input class=\"submit-button\" type=\"submit\" name=\"submit\" value=\"Add Contact\" />\n  </div>\n";
+    return "<input type=\"button\" class=\"btn btn-primary form-toggler\" value=\"Add Contact\">";
 },"useData":true});
 
-},{"hbsfy/runtime":26}],5:[function(require,module,exports){
+},{"hbsfy/runtime":27}],5:[function(require,module,exports){
+"use strict";
+// hbsfy compiled Handlebars template
+var HandlebarsCompiler = require('hbsfy/runtime');
+module.exports = HandlebarsCompiler.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
+    return "<h1>Enter Contact Information</h1>\n  <div class=\"well form-group col-md-6\">\n    <div class=\"form-info\">\n    \n      <label for=\"first-name\">\n        First Name\n      </label>\n      <input type=\"text\" class=\"form-control\" id=\"first-name\" name=\"first-name\" placeholder=\"ENTER FIRST NAME\" />\n       \n      <label for=\"last-name\">\n        Last Name\n      </label>\n      <input type=\"text\" class=\"form-control\" id=\"last-name\" name=\"last-name\" placeholder=\"ENTER LAST NAME\" /> \n       \n      <label for=\"c-number\">\n        Number\n      </label>\n      <input type=\"text\" class=\"form-control\" id=\"c-number\" name=\"c-number\" placeholder=\"ENTER CONTACT NUMBER\" />\n       \n      <label for=\"email\">\n        Email\n      </label>\n      <input type=\"text\" class=\"form-control\" id=\"email\" name=\"email\" placeholder=\"ENTER CONTACT EMAIL\" />\n        \n        <label for=\"linkedin\">\n          Linkedin Username\n        </label>\n        <input type=\"text\" class=\"form-control\" id=\"linkedin\" name=\"linkedin\" placeholder=\"ENTER LINKEDIN USERNAME\" />\n      </div>\n        <input class=\"btn btn-success save-contact\" type=\"submit\" name=\"submit\" value=\"Save Contact\" />\n  </div>\n";
+},"useData":true});
+
+},{"hbsfy/runtime":27}],6:[function(require,module,exports){
 "use strict";
 // hbsfy compiled Handlebars template
 var HandlebarsCompiler = require('hbsfy/runtime');
 module.exports = HandlebarsCompiler.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
     var helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
 
-  return "<h1>Manage Contact</h1>\n  <div class=\"contact-name contact-info\">\n  <span>Name:</span><span>"
-    + alias4(((helper = (helper = helpers.name || (depth0 != null ? depth0.name : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"name","hash":{},"data":data}) : helper)))
-    + "</span>\n  </div>\n    <div class=\"contact-number contact-info\">\n      <span>Number:</span><span>"
-    + alias4(((helper = (helper = helpers.phonenumber || (depth0 != null ? depth0.phonenumber : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"phonenumber","hash":{},"data":data}) : helper)))
+  return "\n  <div class=\"contact-name contact-info\">\n  <span>Name:</span><span>"
+    + alias4(((helper = (helper = helpers.firstName || (depth0 != null ? depth0.firstName : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"firstName","hash":{},"data":data}) : helper)))
+    + "</span><span>"
+    + alias4(((helper = (helper = helpers.lastName || (depth0 != null ? depth0.lastName : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"lastName","hash":{},"data":data}) : helper)))
+    + "</span>\n  </div>\n  \n    <div class=\"contact-number contact-info\">\n      <span>Number:</span><span>"
+    + alias4(((helper = (helper = helpers.phoneNumber || (depth0 != null ? depth0.phoneNumber : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"phoneNumber","hash":{},"data":data}) : helper)))
     + "</span>\n    </div>\n      <div class=\"contact-email contact-info\">\n        <span>Email:</span><span>"
     + alias4(((helper = (helper = helpers.email || (depth0 != null ? depth0.email : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"email","hash":{},"data":data}) : helper)))
     + "</span>\n      </div>\n        <div class=\"contact-linkedin contact-info\">\n          <span>Linkedin:</span><span>"
     + alias4(((helper = (helper = helpers.linkedin || (depth0 != null ? depth0.linkedin : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"linkedin","hash":{},"data":data}) : helper)))
-    + "</span>\n        </div>\n          <button class=\"btn btn-sm btn-danger delete-contact\">Delete Contact</button>\n";
+    + "</span>\n        </div>\n          <button class=\"btn btn-sm btn-danger delete-contact\">Delete "
+    + alias4(((helper = (helper = helpers.firstName || (depth0 != null ? depth0.firstName : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"firstName","hash":{},"data":data}) : helper)))
+    + "</button>\n          <!-- <button class=\"btn btn-warning edit-contact\">Edit "
+    + alias4(((helper = (helper = helpers.firstName || (depth0 != null ? depth0.firstName : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"firstName","hash":{},"data":data}) : helper)))
+    + "</button> -->\n          <!-- <button class=\"btn btn-success update-contact\">Update "
+    + alias4(((helper = (helper = helpers.firstName || (depth0 != null ? depth0.firstName : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"firstName","hash":{},"data":data}) : helper)))
+    + "</button> -->\n";
 },"useData":true});
 
-},{"hbsfy/runtime":26}],6:[function(require,module,exports){
+},{"hbsfy/runtime":27}],7:[function(require,module,exports){
 (function (global){
 //     Backbone.js 1.3.3
 
@@ -2077,7 +2153,7 @@ module.exports = HandlebarsCompiler.template({"compiler":[7,">= 4.0.0"],"main":f
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"jquery":27,"underscore":28}],7:[function(require,module,exports){
+},{"jquery":28,"underscore":29}],8:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2145,7 +2221,7 @@ exports['default'] = inst;
 module.exports = exports['default'];
 
 
-},{"./handlebars/base":8,"./handlebars/exception":11,"./handlebars/no-conflict":21,"./handlebars/runtime":22,"./handlebars/safe-string":23,"./handlebars/utils":24}],8:[function(require,module,exports){
+},{"./handlebars/base":9,"./handlebars/exception":12,"./handlebars/no-conflict":22,"./handlebars/runtime":23,"./handlebars/safe-string":24,"./handlebars/utils":25}],9:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2251,7 +2327,7 @@ exports.createFrame = _utils.createFrame;
 exports.logger = _logger2['default'];
 
 
-},{"./decorators":9,"./exception":11,"./helpers":12,"./logger":20,"./utils":24}],9:[function(require,module,exports){
+},{"./decorators":10,"./exception":12,"./helpers":13,"./logger":21,"./utils":25}],10:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2269,7 +2345,7 @@ function registerDefaultDecorators(instance) {
 }
 
 
-},{"./decorators/inline":10}],10:[function(require,module,exports){
+},{"./decorators/inline":11}],11:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2300,7 +2376,7 @@ exports['default'] = function (instance) {
 module.exports = exports['default'];
 
 
-},{"../utils":24}],11:[function(require,module,exports){
+},{"../utils":25}],12:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2353,7 +2429,7 @@ exports['default'] = Exception;
 module.exports = exports['default'];
 
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2401,7 +2477,7 @@ function registerDefaultHelpers(instance) {
 }
 
 
-},{"./helpers/block-helper-missing":13,"./helpers/each":14,"./helpers/helper-missing":15,"./helpers/if":16,"./helpers/log":17,"./helpers/lookup":18,"./helpers/with":19}],13:[function(require,module,exports){
+},{"./helpers/block-helper-missing":14,"./helpers/each":15,"./helpers/helper-missing":16,"./helpers/if":17,"./helpers/log":18,"./helpers/lookup":19,"./helpers/with":20}],14:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2442,7 +2518,7 @@ exports['default'] = function (instance) {
 module.exports = exports['default'];
 
 
-},{"../utils":24}],14:[function(require,module,exports){
+},{"../utils":25}],15:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2538,7 +2614,7 @@ exports['default'] = function (instance) {
 module.exports = exports['default'];
 
 
-},{"../exception":11,"../utils":24}],15:[function(require,module,exports){
+},{"../exception":12,"../utils":25}],16:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2565,7 +2641,7 @@ exports['default'] = function (instance) {
 module.exports = exports['default'];
 
 
-},{"../exception":11}],16:[function(require,module,exports){
+},{"../exception":12}],17:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2596,7 +2672,7 @@ exports['default'] = function (instance) {
 module.exports = exports['default'];
 
 
-},{"../utils":24}],17:[function(require,module,exports){
+},{"../utils":25}],18:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2624,7 +2700,7 @@ exports['default'] = function (instance) {
 module.exports = exports['default'];
 
 
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2638,7 +2714,7 @@ exports['default'] = function (instance) {
 module.exports = exports['default'];
 
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2673,7 +2749,7 @@ exports['default'] = function (instance) {
 module.exports = exports['default'];
 
 
-},{"../utils":24}],20:[function(require,module,exports){
+},{"../utils":25}],21:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2722,7 +2798,7 @@ exports['default'] = logger;
 module.exports = exports['default'];
 
 
-},{"./utils":24}],21:[function(require,module,exports){
+},{"./utils":25}],22:[function(require,module,exports){
 (function (global){
 /* global window */
 'use strict';
@@ -2746,7 +2822,7 @@ module.exports = exports['default'];
 
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -3045,7 +3121,7 @@ function executeDecorators(fn, prog, container, depths, data, blockParams) {
 }
 
 
-},{"./base":8,"./exception":11,"./utils":24}],23:[function(require,module,exports){
+},{"./base":9,"./exception":12,"./utils":25}],24:[function(require,module,exports){
 // Build out our basic SafeString type
 'use strict';
 
@@ -3062,7 +3138,7 @@ exports['default'] = SafeString;
 module.exports = exports['default'];
 
 
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -3188,15 +3264,15 @@ function appendContextPath(contextPath, id) {
 }
 
 
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 // Create a simple path alias to allow browserify to resolve
 // the runtime on a supported path.
 module.exports = require('./dist/cjs/handlebars.runtime')['default'];
 
-},{"./dist/cjs/handlebars.runtime":7}],26:[function(require,module,exports){
+},{"./dist/cjs/handlebars.runtime":8}],27:[function(require,module,exports){
 module.exports = require("handlebars/runtime")["default"];
 
-},{"handlebars/runtime":25}],27:[function(require,module,exports){
+},{"handlebars/runtime":26}],28:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v2.2.4
  * http://jquery.com/
@@ -13012,7 +13088,7 @@ if ( !noGlobal ) {
 return jQuery;
 }));
 
-},{}],28:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 //     Underscore.js 1.8.3
 //     http://underscorejs.org
 //     (c) 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
