@@ -1,9 +1,10 @@
-<h1>Manage Contact</h1>
+
   <div class="contact-name contact-info">
-  <span>Name:</span><span>{{name}}</span>
+  <span>Name:</span><span>{{firstName}}</span><span>{{lastName}}</span>
   </div>
+  
     <div class="contact-number contact-info">
-      <span>Number:</span><span>{{phonenumber}}</span>
+      <span>Number:</span><span>{{phoneNumber}}</span>
     </div>
       <div class="contact-email contact-info">
         <span>Email:</span><span>{{email}}</span>
@@ -11,4 +12,6 @@
         <div class="contact-linkedin contact-info">
           <span>Linkedin:</span><span>{{linkedin}}</span>
         </div>
-          <button class="btn btn-sm btn-danger delete-contact">Delete Contact</button>
+          <button class="btn btn-sm btn-danger delete-contact">Delete {{firstName}}</button>
+          <!-- <button class="btn btn-warning edit-contact">Edit {{firstName}}</button> -->
+          <!-- <button class="btn btn-success update-contact">Update {{firstName}}</button> -->

@@ -16,6 +16,23 @@ img {
   max-width: 100%;
 }
 
+.form-input {
+  background-color: #000;
+}
+
+.form-control-wrapper {
+  text-align: right;
+  padding: 20px 10px;
+}
+
+#contact-form {
+  display: none;
+}
+
+#contact-form h1 {
+  color: #FFF;
+}
+
 .form-info{
   margin-top: 30px;
 
@@ -28,14 +45,9 @@ img {
   margin-top: 25px;
 }
 
-.contact-info{
-  border-bottom: 1px solid black;
-  padding: 5px;
-}
-
-.contactInfo{
-  border-bottom: 1px solid black;
-  padding-bottom: 20px;
+.contactInfo {
+  border-bottom: 1px dotted black;
+  padding: 20px;
 }
 
 .delete-contact{
@@ -56,4 +68,12 @@ img {
   li{
     list-style: none;
   }
+}
+
+// .update-contact {
+//   display: none;
+// }
+
+.btn-success {
+  margin-top: 15px;
 }

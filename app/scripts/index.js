@@ -7,6 +7,9 @@ $(function(){
 
   var contactCollection = new models.ContactCollection();
 
+  var contactControl = new views.ContactFormControl();
+  $('.form-input').append(contactControl.render().el);
+
   var contactForm = new views.ContactForm({collection: contactCollection});
   $('.form-input').append(contactForm.render().el);
 

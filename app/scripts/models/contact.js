@@ -6,7 +6,7 @@ var Contact = Backbone.Model.extend({
 
 var ContactCollection = Backbone.Collection.extend({
   model: Contact,
-  url: 'https://tiny-lasagna-server.herokuapp.com/collections/contacts'
+  url: 'https://tiny-lasagna-server.herokuapp.com/collections/ev-contacts'
 });
 
 module.exports = {
